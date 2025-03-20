@@ -16,6 +16,7 @@ $options = Array(
 $context = stream_context_create($options);
 
 while($url = trim(fgets(STDIN))){
+  $val = '';
   if ($content = file_get_contents($url, false, $context)) {
     fwrite(STDERR, $url . "\n");
     $doc = new DOMDocument();
@@ -24,14 +25,13 @@ while($url = trim(fgets(STDIN))){
     $xpath = new DOMXPath($doc);
     $nodes = $xpath->query('//div[@itemprop="sku"]');
     //  $nodes = $xpath->query("//div[(contains(@class,'info-item-producto') and not(contains(@class,'sin-stock')))]/a/@data-crosss-id-catalog");
-    $val = '';
     foreach ($nodes as $node) {
       $val .= $node->nodeValue;
     }
-    echo $val . "\t" . $url . "\n";
   } else {
     fwrite(STDERR, "Can't get '" . $url . "'\n");
   }
+  echo $val . "\t" . $url . "\n";
 }
 exit;
 
