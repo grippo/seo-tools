@@ -8,8 +8,10 @@ if ($argc < 2) {
 }
 $url = $argv[1];
 $print_header = false;
+$print_info = false;
 if (isset($argv[2])) {
     $print_header = ($argv[2] == 1);
+    $print_info = ($argv[2] == 2);
 }
 $options = Array(
   'http' => Array(
@@ -22,10 +24,11 @@ $options = Array(
 );
 $context = stream_context_create($options);
 if ($content = file_get_contents($url, false, $context)) {
-  if ($print_header) echo "URL\tTITLE AS IS\tTITLE TO BE\t#1\tH1 AS IS\tH1 TO BE\tDESCRIPTION AS IS\tDESCRIPTION TO BE\t#2\n";
+  if ($print_header) echo "URL\tTITLE AS IS\tTITLE TO BE\t#1\tH1 AS IS\tH1 TO BE\tDESCRIPTION AS IS\tDESCRIPTION TO BE\t#2\tROBOTS\n";
   $title = '';
   $h1 = '';
   $description = '';
+  $robots = '';
 
   fwrite(STDERR, $url . "'\n");
   $doc = new DOMDocument();
@@ -47,6 +50,14 @@ if ($content = file_get_contents($url, false, $context)) {
     $description .= $node->nodeValue;
   }
 
+  $query = '/html/head/meta[@name="robots"]/@content';
+  fwrite(STDERR, "\t" . $query . "\n");
+  $nodes = $xpath->query($query);
+  foreach ($nodes as $node) {
+    $robots .= $node->nodeValue;
+  }
+
+
   $query = '/html/body/h1';
   fwrite(STDERR, "\t" . $query . "\n");
   $nodes = $xpath->query($query);
@@ -54,7 +65,11 @@ if ($content = file_get_contents($url, false, $context)) {
     $h1 .= $node->nodeValue;
   }
 
-  echo $url . "\t" . $title . "\t" . $title . "\t\t" . $h1 . "\t" .$h1 . "\t" . $description . "\t" . $description . "\t\n";
+  if ($print_info) {
+    echo "url" . $url . "\nTitle: " . $title . "\nH1:" . $h1 . "\nDescription:" . $description . "\nRobots:" . $robots . "\n\n";
+  } else {
+    echo $url . "\t" . $title . "\t" . $title . "\t\t" . $h1 . "\t" .$h1 . "\t" . $description . "\t" . $description . "\t\t" . $robots . "\t\n";
+  }
 
 } else {
   fwrite(STDERR, "Can't get '" . $url . "'\n");

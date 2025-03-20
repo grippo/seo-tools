@@ -23,8 +23,8 @@ if ($content = file_get_contents($url, false, $context)) {
   $doc->loadHTML($content);
   unset($content);
   $xpath = new DOMXPath($doc);
-//  $nodes = $xpath->query('//a/@href');
-  $nodes = $xpath->query("//div[(contains(@class,'info-item-producto') and not(contains(@class,'sin-stock')))]/a/@data-crosss-id-catalog");
+  $nodes = $xpath->query('//a/@href');
+//  $nodes = $xpath->query("//div[(contains(@class,'info-item-producto') and not(contains(@class,'sin-stock')))]/a/@data-crosss-id-catalog");
   foreach ($nodes as $node) {
     echo "\t" . $node->nodeValue . "\n";
   }
